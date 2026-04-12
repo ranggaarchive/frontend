@@ -23,13 +23,17 @@ export default function HomePage() {
             </p>
             <div className="flex flex-col gap-3">
               <Link to="/register" className="w-full">
-                <Button size="lg" className="w-full bg-white text-blue-600 hover:bg-gray-100">
+                <Button size="lg" className="w-full bg-white text-blue-600 hover:bg-gray-100 h-12 text-base font-semibold">
                   Mulai Investasi
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
               <Link to="/login" className="w-full">
-                <Button size="lg" variant="outline" className="w-full border-white text-white hover:bg-white/10">
+                <Button 
+                  size="lg" 
+                  variant="outline" 
+                  className="w-full border-2 border-white text-white hover:bg-white hover:text-blue-600 h-12 text-base font-semibold"
+                >
                   Masuk
                 </Button>
               </Link>
