@@ -93,7 +93,7 @@ export default function InvestorDashboard() {
                 />
                 <YAxis hide />
                 <Tooltip 
-                  formatter={(value: number) => [`Rp ${(value / 1000000).toFixed(0)}jt`, 'Nilai']}
+                  formatter={(value) => [`Rp ${(Number(value) / 1000000).toFixed(0)}jt`, 'Nilai']}
                   contentStyle={{ 
                     backgroundColor: 'white', 
                     border: '1px solid #e5e7eb',

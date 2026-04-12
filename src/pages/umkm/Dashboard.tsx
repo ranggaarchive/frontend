@@ -228,7 +228,7 @@ export default function UmkmDashboard() {
                 />
                 <YAxis hide />
                 <Tooltip 
-                  formatter={(value: number) => [`Rp ${value.toLocaleString()}`, 'Harga']}
+                  formatter={(value) => [`Rp ${Number(value).toLocaleString()}`, 'Harga']}
                   contentStyle={{ 
                     backgroundColor: 'white', 
                     border: '1px solid #e5e7eb',

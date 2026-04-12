@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { useParams } from 'react-router-dom'
 import Layout from '@/components/Layout'
 import MobileHeader from '@/components/MobileHeader'
 import { Card, CardContent } from '@/components/ui/card'
@@ -71,7 +70,6 @@ const chartData = {
 }
 
 export default function OrderbookPage() {
-  const { umkmId } = useParams()
   const [orderType, setOrderType] = useState<'buy' | 'sell'>('buy')
   const [shares, setShares] = useState('')
   const [price, setPrice] = useState('')
@@ -161,7 +159,7 @@ export default function OrderbookPage() {
                 hide
               />
               <Tooltip 
-                formatter={(value: number) => [`Rp ${value.toLocaleString()}`, 'Harga']}
+                formatter={(value) => [`Rp ${Number(value).toLocaleString()}`, 'Harga']}
                 contentStyle={{ 
                   backgroundColor: 'white', 
                   border: '1px solid #e5e7eb',

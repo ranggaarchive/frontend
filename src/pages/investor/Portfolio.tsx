@@ -93,12 +93,12 @@ export default function PortfolioPage() {
                   fill="#8884d8"
                   dataKey="value"
                 >
-                  {pieData.map((entry, index) => (
+                  {pieData.map((_, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
                 <Tooltip 
-                  formatter={(value: number) => `Rp ${(value / 1000000).toFixed(1)}jt`}
+                  formatter={(value) => `Rp ${(Number(value) / 1000000).toFixed(1)}jt`}
                   contentStyle={{ 
                     backgroundColor: 'white', 
                     border: '1px solid #e5e7eb',
