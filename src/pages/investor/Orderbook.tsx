@@ -9,14 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import { TrendingUp, TrendingDown, Star, Download, FileText, AlertCircle } from 'lucide-react'
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from '@/components/ui/sheet'
+
 
 const buyOrders = [
   { price: 49500, volume: 150 },
@@ -379,67 +372,92 @@ export default function OrderbookPage() {
 
       {/* Fixed Bottom Action */}
       <div className="fixed bottom-16 left-1/2 -translate-x-1/2 w-full max-w-[480px] bg-white border-t p-4 z-40">
-        <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-          <SheetTrigger asChild>
-            <Button className="w-full h-12 text-base font-semibold">
-              Trade Sekarang
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="bottom" className="h-[85vh] max-w-[480px] left-1/2 -translate-x-1/2">
-            <SheetHeader className="mb-6">
-              <SheetTitle>Buat Order</SheetTitle>
-              <SheetDescription>Warung Makan Sederhana</SheetDescription>
-            </SheetHeader>
-            <Tabs value={orderType} onValueChange={(v) => setOrderType(v as 'buy' | 'sell')}>
-              <TabsList className="grid w-full grid-cols-2 mb-6">
-                <TabsTrigger value="buy">Beli</TabsTrigger>
-                <TabsTrigger value="sell">Jual</TabsTrigger>
-              </TabsList>
-              <TabsContent value={orderType}>
-                <form onSubmit={handleSubmitOrder} className="space-y-5">
-                  <div className="space-y-2">
-                    <Label htmlFor="price" className="text-base">Harga per Saham</Label>
-                    <Input
-                      id="price"
-                      type="number"
-                      placeholder="50000"
-                      value={price}
-                      onChange={(e) => setPrice(e.target.value)}
-                      required
-                      className="h-12 text-base"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="shares" className="text-base">Jumlah Saham</Label>
-                    <Input
-                      id="shares"
-                      type="number"
-                      placeholder="100"
-                      value={shares}
-                      onChange={(e) => setShares(e.target.value)}
-                      required
-                      className="h-12 text-base"
-                    />
-                  </div>
-                  {price && shares && (
-                    <Card className="bg-gray-50 border-0">
-                      <CardContent className="pt-4 pb-4">
-                        <p className="text-sm text-gray-600 mb-1">Total</p>
-                        <p className="text-2xl font-bold">
-                          Rp {(parseInt(price) * parseInt(shares)).toLocaleString()}
-                        </p>
-                      </CardContent>
-                    </Card>
-                  )}
-                  <Button type="submit" className="w-full h-12 text-base font-semibold">
-                    {orderType === 'buy' ? 'Beli Saham' : 'Jual Saham'}
-                  </Button>
-                </form>
-              </TabsContent>
-            </Tabs>
-          </SheetContent>
-        </Sheet>
+        <Button 
+          className="w-full h-12 text-base font-semibold"
+          onClick={() => setSheetOpen(true)}
+        >
+          Trade Sekarang
+        </Button>
       </div>
+
+      {/* Trade Sheet Modal */}
+      {sheetOpen && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center">
+          {/* Backdrop */}
+          <div 
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setSheetOpen(false)}
+          />
+          
+          {/* Sheet Content */}
+          <div className="relative w-full max-w-[480px] bg-white rounded-t-3xl shadow-xl animate-in slide-in-from-bottom duration-300">
+            <div className="p-6 max-h-[85vh] overflow-y-auto">
+              {/* Header */}
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-2">
+                  <h2 className="text-xl font-bold">Buat Order</h2>
+                  <button
+                    onClick={() => setSheetOpen(false)}
+                    className="h-8 w-8 rounded-full hover:bg-gray-100 flex items-center justify-center"
+                  >
+                    <span className="text-2xl text-gray-400">&times;</span>
+                  </button>
+                </div>
+                <p className="text-sm text-gray-600">Warung Makan Sederhana</p>
+              </div>
+
+              {/* Tabs */}
+              <Tabs value={orderType} onValueChange={(v) => setOrderType(v as 'buy' | 'sell')}>
+                <TabsList className="grid w-full grid-cols-2 mb-6">
+                  <TabsTrigger value="buy">Beli</TabsTrigger>
+                  <TabsTrigger value="sell">Jual</TabsTrigger>
+                </TabsList>
+                <TabsContent value={orderType}>
+                  <form onSubmit={handleSubmitOrder} className="space-y-5">
+                    <div className="space-y-2">
+                      <Label htmlFor="price" className="text-base">Harga per Saham</Label>
+                      <Input
+                        id="price"
+                        type="number"
+                        placeholder="50000"
+                        value={price}
+                        onChange={(e) => setPrice(e.target.value)}
+                        required
+                        className="h-12 text-base"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="shares" className="text-base">Jumlah Saham</Label>
+                      <Input
+                        id="shares"
+                        type="number"
+                        placeholder="100"
+                        value={shares}
+                        onChange={(e) => setShares(e.target.value)}
+                        required
+                        className="h-12 text-base"
+                      />
+                    </div>
+                    {price && shares && (
+                      <Card className="bg-gray-50 border-0">
+                        <CardContent className="pt-4 pb-4">
+                          <p className="text-sm text-gray-600 mb-1">Total</p>
+                          <p className="text-2xl font-bold">
+                            Rp {(parseInt(price) * parseInt(shares)).toLocaleString()}
+                          </p>
+                        </CardContent>
+                      </Card>
+                    )}
+                    <Button type="submit" className="w-full h-12 text-base font-semibold">
+                      {orderType === 'buy' ? 'Beli Saham' : 'Jual Saham'}
+                    </Button>
+                  </form>
+                </TabsContent>
+              </Tabs>
+            </div>
+          </div>
+        </div>
+      )}
     </Layout>
   )
 }
