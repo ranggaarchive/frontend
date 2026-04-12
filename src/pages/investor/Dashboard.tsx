@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
-import { TrendingUp, Wallet, Eye, ArrowUpRight, ArrowRight, Star } from 'lucide-react'
+import { TrendingUp, Wallet, ArrowUpRight, ArrowRight, Star } from 'lucide-react'
 
 const portfolioHistory = [
   { month: 'Okt', value: 95000000 },

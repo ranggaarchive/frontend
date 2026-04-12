@@ -1,12 +1,10 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import Layout from '@/components/Layout'
 import MobileHeader from '@/components/MobileHeader'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
 import { Wallet, CreditCard, Building2, CheckCircle, AlertCircle, ArrowRight } from 'lucide-react'
 
 const paymentMethods = [
@@ -23,7 +21,6 @@ const paymentMethods = [
 const quickAmounts = [100000, 500000, 1000000, 5000000]
 
 export default function InvestorDeposit() {
-  const navigate = useNavigate()
   const [amount, setAmount] = useState('')
   const [selectedMethod, setSelectedMethod] = useState('')
 
@@ -31,7 +28,8 @@ export default function InvestorDeposit() {
     e.preventDefault()
     // Simulasi redirect ke Midtrans
     alert(`Redirect ke Midtrans untuk deposit Rp ${parseInt(amount).toLocaleString()} via ${selectedMethod}`)
-    // navigate('/investor/dashboard')
+    // TODO: Integrate with Midtrans
+    // window.location.href = midtransPaymentUrl
   }
 
   const selectedPayment = paymentMethods.find(m => m.id === selectedMethod)
