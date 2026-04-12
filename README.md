@@ -1,73 +1,107 @@
-# React + TypeScript + Vite
+# Platform Investasi Saham UMKM
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Platform marketplace untuk menghubungkan investor dengan UMKM (Usaha Mikro Kecil Menengah) di Indonesia. Aplikasi ini memungkinkan UMKM untuk listing usaha mereka, investor untuk membeli saham, dan auditor untuk memvalidasi kelayakan listing.
 
-Currently, two official plugins are available:
+## Fitur Utama
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+### 🏢 Untuk Pemilik UMKM
+- Dashboard untuk monitoring performa saham
+- Form pengajuan listing usaha
+- Upload laporan keuangan berkala
+- Manajemen profil usaha
+- Tracking investor
 
-## React Compiler
+### 💰 Untuk Investor
+- Marketplace UMKM terverifikasi dengan filter & sorting
+- Orderbook real-time untuk trading saham
+- Chart harga dengan timeframe selector (1D, 1W, 1M, 3M, 1Y)
+- Portfolio management dengan pie chart & breakdown
+- Portfolio performance chart
+- Top gainers & top volume
+- Tracking performa investasi real-time
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### ✅ Untuk Auditor
+- Review pengajuan listing UMKM
+- Validasi dokumen dan laporan keuangan
+- Approve/reject listing
+- Dashboard monitoring
 
-## Expanding the ESLint configuration
+## Fitur Visual
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **Chart Interaktif**: Line chart, area chart, dan pie chart menggunakan Recharts
+- **Gradient Background**: Desain modern dengan gradient background
+- **Responsive Design**: Tampilan optimal di semua ukuran layar
+- **Hover Effects**: Animasi smooth pada card dan button
+- **Professional UI**: Desain yang clean dan profesional seperti aplikasi trading modern
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Tech Stack
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- **React 19** - UI Framework
+- **React Router DOM 7** - Routing
+- **Shadcn UI** - Component Library
+- **Tailwind CSS 4** - Styling
+- **TypeScript** - Type Safety
+- **Vite** - Build Tool
+- **Lucide React** - Icons
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Struktur Halaman
+
+```
+/                           - Landing page
+/login                      - Login page
+/register                   - Register page
+
+# Investor Routes
+/investor/dashboard         - Dashboard investor
+/investor/marketplace       - Marketplace UMKM
+/investor/portfolio         - Portfolio investasi
+/investor/orderbook/:id     - Orderbook trading
+
+# UMKM Routes
+/umkm/dashboard            - Dashboard UMKM
+/umkm/listing              - Form pengajuan listing
+/umkm/reports              - Laporan keuangan
+/umkm/profile              - Profil usaha
+
+# Auditor Routes
+/auditor/dashboard         - Dashboard auditor
+/auditor/review/:id        - Review pengajuan
+/auditor/approved          - Daftar UMKM approved
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Instalasi
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+```bash
+# Install dependencies
+npm install
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Run development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
 ```
+
+## Development
+
+Aplikasi ini menggunakan:
+- Shadcn UI components yang sudah terinstall
+- React Router DOM untuk routing
+- TypeScript untuk type safety
+- Vite untuk fast development
+
+Semua komponen UI menggunakan Shadcn UI yang sudah ada di `src/components/ui/`.
+
+## Catatan
+
+Ini adalah prototype/demo aplikasi. Untuk production:
+- Implementasi backend API
+- Tambahkan authentication & authorization
+- Implementasi real-time orderbook dengan WebSocket
+- Tambahkan payment gateway
+- Implementasi file upload yang proper
+- Tambahkan validasi form yang lebih ketat
+- Implementasi state management (Redux/Zustand)
