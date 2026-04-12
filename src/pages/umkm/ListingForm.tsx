@@ -97,22 +97,33 @@ export default function UmkmListingForm() {
           <Card>
             <CardHeader>
               <CardTitle>Informasi Saham</CardTitle>
-              <CardDescription>Detail penawaran saham</CardDescription>
+              <CardDescription>Detail penawaran saham untuk investor</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="totalShares">Total Saham</Label>
                   <Input id="totalShares" type="number" placeholder="10000" required />
+                  <p className="text-xs text-gray-500">Total saham yang akan diterbitkan</p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="pricePerShare">Harga per Saham</Label>
                   <Input id="pricePerShare" type="number" placeholder="50000" required />
+                  <p className="text-xs text-gray-500">Harga awal per lembar saham</p>
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="sharesOffered">Saham yang Ditawarkan (%)</Label>
-                <Input id="sharesOffered" type="number" placeholder="30" min="1" max="100" required />
+                <Label htmlFor="sharesOffered">Persentase Saham yang Dijual (%)</Label>
+                <Input id="sharesOffered" type="number" placeholder="20" min="1" max="49" required />
+                <p className="text-xs text-gray-500">
+                  Contoh: Jika 20%, maka dividen = 20% dari laba bersih akan dibagikan ke investor
+                </p>
+              </div>
+              <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-sm text-blue-800">
+                  <strong>Catatan:</strong> Persentase saham yang Anda jual akan menentukan pembagian dividen. 
+                  Misalnya jika Anda menjual 20% saham, maka 20% dari laba bersih akan dibagikan sebagai dividen kepada investor.
+                </p>
               </div>
             </CardContent>
           </Card>

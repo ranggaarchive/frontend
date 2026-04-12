@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
-import { TrendingUp, Wallet, ArrowUpRight, ArrowRight, Star } from 'lucide-react'
+import { TrendingUp, Wallet, ArrowUpRight, ArrowRight, Star, DollarSign } from 'lucide-react'
 
 const portfolioHistory = [
   { month: 'Okt', value: 95000000 },
@@ -121,14 +121,14 @@ export default function InvestorDashboard() {
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-semibold">Quick Actions</h3>
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-3 gap-3">
             <Link to="/investor/marketplace">
               <Card className="hover:shadow-md transition-shadow">
                 <CardContent className="pt-5 pb-5 text-center">
                   <div className="h-12 w-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-2">
                     <TrendingUp className="h-6 w-6 text-blue-600" />
                   </div>
-                  <p className="font-medium text-sm">Marketplace</p>
+                  <p className="font-medium text-xs">Marketplace</p>
                 </CardContent>
               </Card>
             </Link>
@@ -138,7 +138,17 @@ export default function InvestorDashboard() {
                   <div className="h-12 w-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-2">
                     <Wallet className="h-6 w-6 text-green-600" />
                   </div>
-                  <p className="font-medium text-sm">Portfolio</p>
+                  <p className="font-medium text-xs">Portfolio</p>
+                </CardContent>
+              </Card>
+            </Link>
+            <Link to="/investor/dividend">
+              <Card className="hover:shadow-md transition-shadow">
+                <CardContent className="pt-5 pb-5 text-center">
+                  <div className="h-12 w-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-2">
+                    <DollarSign className="h-6 w-6 text-purple-600" />
+                  </div>
+                  <p className="font-medium text-xs">Dividen</p>
                 </CardContent>
               </Card>
             </Link>

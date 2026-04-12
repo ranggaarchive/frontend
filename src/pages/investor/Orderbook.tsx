@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
-import { TrendingUp, TrendingDown, Star, Download, FileText, AlertCircle } from 'lucide-react'
+import { TrendingUp, TrendingDown, Star, Download, FileText, AlertCircle, DollarSign } from 'lucide-react'
 
 
 const buyOrders = [
@@ -173,11 +173,11 @@ export default function OrderbookPage() {
 
         {/* Orderbook */}
         <div className="px-4 py-4 space-y-4">
-          <Tabs defaultValue="chart">
+          <Tabs defaultValue="info">
             <TabsList className="w-full grid grid-cols-3">
-              <TabsTrigger value="chart">Chart</TabsTrigger>
-              <TabsTrigger value="orderbook">Orderbook</TabsTrigger>
               <TabsTrigger value="info">Info</TabsTrigger>
+              <TabsTrigger value="orderbook">Orderbook</TabsTrigger>
+              <TabsTrigger value="chart">Chart</TabsTrigger>
             </TabsList>
             
             <TabsContent value="chart" className="mt-4">
@@ -304,7 +304,11 @@ export default function OrderbookPage() {
                     </div>
                     <div className="flex justify-between py-2 border-b">
                       <span className="text-gray-600">Saham Beredar</span>
-                      <span className="font-medium">5.200 (52%)</span>
+                      <span className="font-medium">2.000 (20%)</span>
+                    </div>
+                    <div className="flex justify-between py-2 border-b">
+                      <span className="text-gray-600">Saham Terjual</span>
+                      <span className="font-medium">1.800 (18%)</span>
                     </div>
                     <div className="flex justify-between py-2 border-b">
                       <span className="text-gray-600">Market Cap</span>
@@ -313,6 +317,50 @@ export default function OrderbookPage() {
                     <div className="flex justify-between py-2">
                       <span className="text-gray-600">Total Investor</span>
                       <span className="font-medium">248</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Dividend Info */}
+              <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
+                <CardContent className="pt-5 pb-5">
+                  <div className="flex items-start gap-3 mb-4">
+                    <div className="h-10 w-10 bg-green-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <DollarSign className="h-5 w-5 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold mb-1">Dividen</h3>
+                      <p className="text-xs text-gray-600">Pembagian keuntungan untuk investor</p>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="p-3 bg-white rounded-lg">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-sm text-gray-600">Persentase Dividen</span>
+                        <span className="text-2xl font-bold text-green-600">20%</span>
+                      </div>
+                      <p className="text-xs text-gray-500">
+                        20% dari laba bersih dibagikan sebagai dividen kepada pemegang saham
+                      </p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="p-3 bg-white rounded-lg">
+                        <p className="text-xs text-gray-500 mb-1">Dividen Terakhir</p>
+                        <p className="font-bold text-green-600">Rp 24jt</p>
+                        <p className="text-xs text-gray-400">Q4 2025</p>
+                      </div>
+                      <div className="p-3 bg-white rounded-lg">
+                        <p className="text-xs text-gray-500 mb-1">Per Saham</p>
+                        <p className="font-bold text-green-600">Rp 13.3k</p>
+                        <p className="text-xs text-gray-400">Q4 2025</p>
+                      </div>
+                    </div>
+                    <div className="p-3 bg-green-100 rounded-lg">
+                      <p className="text-xs font-semibold text-green-800 mb-1">Estimasi Dividen Anda</p>
+                      <p className="text-sm text-green-700">
+                        Jika Anda memiliki 100 saham, estimasi dividen per kuartal: <span className="font-bold">Rp 1.33jt</span>
+                      </p>
                     </div>
                   </div>
                 </CardContent>

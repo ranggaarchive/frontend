@@ -8,12 +8,14 @@ import PortfolioPage from './pages/investor/Portfolio.tsx'
 import OrderbookPage from './pages/investor/Orderbook.tsx'
 import InvestorProfile from './pages/investor/Profile.tsx'
 import InvestorDeposit from './pages/investor/Deposit.tsx'
+import InvestorDividend from './pages/investor/Dividend.tsx'
 import UmkmDashboard from './pages/umkm/Dashboard.tsx'
 import UmkmListingForm from './pages/umkm/ListingForm.tsx'
 import UmkmListingDetail from './pages/umkm/ListingDetail.tsx'
 import UmkmReports from './pages/umkm/Reports.tsx'
 import UmkmProfile from './pages/umkm/Profile.tsx'
 import UmkmInvestors from './pages/umkm/Investors.tsx'
+import UmkmDividend from './pages/umkm/Dividend.tsx'
 import AuditorDashboard from './pages/auditor/Dashboard.tsx'
 import AuditorReview from './pages/auditor/Review.tsx'
 import AuditorApproved from './pages/auditor/Approved.tsx'
@@ -32,6 +34,7 @@ function App() {
       <Route path="/investor/portfolio" element={<PortfolioPage />} />
       <Route path="/investor/orderbook/:umkmId" element={<OrderbookPage />} />
       <Route path="/investor/deposit" element={<InvestorDeposit />} />
+      <Route path="/investor/dividend" element={<InvestorDividend />} />
       <Route path="/investor/profile" element={<InvestorProfile />} />
       
       {/* UMKM Routes */}
@@ -41,6 +44,7 @@ function App() {
       <Route path="/umkm/edit-listing" element={<UmkmListingForm />} />
       <Route path="/umkm/reports" element={<UmkmReports />} />
       <Route path="/umkm/investors" element={<UmkmInvestors />} />
+      <Route path="/umkm/dividend" element={<UmkmDividend />} />
       <Route path="/umkm/profile" element={<UmkmProfile />} />
       <Route path="/umkm/edit-profile" element={<UmkmProfile />} />
       

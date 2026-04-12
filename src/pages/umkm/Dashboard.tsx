@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
-import { Users, TrendingUp, FileText, CheckCircle, ArrowUpRight, Upload, Edit, Clock, AlertCircle, Eye } from 'lucide-react'
+import { Users, TrendingUp, FileText, CheckCircle, ArrowUpRight, Upload, Edit, Clock, AlertCircle, Eye, DollarSign } from 'lucide-react'
 
 const priceHistory = [
   { month: 'Jan', price: 45000 },
@@ -251,24 +251,34 @@ export default function UmkmDashboard() {
         {/* Quick Actions */}
         <div>
           <h3 className="font-semibold mb-3">Quick Actions</h3>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-3 gap-3">
             <Link to="/umkm/reports">
               <Card className="hover:shadow-md transition-shadow">
                 <CardContent className="pt-5 pb-5 text-center">
                   <div className="h-12 w-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-2">
                     <Upload className="h-6 w-6 text-blue-600" />
                   </div>
-                  <p className="font-medium text-sm">Upload Laporan</p>
+                  <p className="font-medium text-xs">Upload Laporan</p>
+                </CardContent>
+              </Card>
+            </Link>
+            <Link to="/umkm/dividend">
+              <Card className="hover:shadow-md transition-shadow">
+                <CardContent className="pt-5 pb-5 text-center">
+                  <div className="h-12 w-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-2">
+                    <DollarSign className="h-6 w-6 text-green-600" />
+                  </div>
+                  <p className="font-medium text-xs">Dividen</p>
                 </CardContent>
               </Card>
             </Link>
             <Link to="/umkm/edit-profile">
               <Card className="hover:shadow-md transition-shadow">
                 <CardContent className="pt-5 pb-5 text-center">
-                  <div className="h-12 w-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-2">
-                    <Edit className="h-6 w-6 text-green-600" />
+                  <div className="h-12 w-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-2">
+                    <Edit className="h-6 w-6 text-purple-600" />
                   </div>
-                  <p className="font-medium text-sm">Edit Profil</p>
+                  <p className="font-medium text-xs">Edit Profil</p>
                 </CardContent>
               </Card>
             </Link>
