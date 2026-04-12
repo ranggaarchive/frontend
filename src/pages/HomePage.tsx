@@ -31,8 +31,7 @@ export default function HomePage() {
               <Link to="/login" className="w-full">
                 <Button 
                   size="lg" 
-                  variant="outline" 
-                  className="w-full border-2 border-white text-white hover:bg-white hover:text-blue-600 h-12 text-base font-semibold"
+                  className="w-full bg-white/20 backdrop-blur text-white border-2 border-white/40 hover:bg-white hover:text-blue-600 h-12 text-base font-semibold"
                 >
                   Masuk
                 </Button>
