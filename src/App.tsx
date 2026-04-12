@@ -7,6 +7,7 @@ import MarketplacePage from './pages/investor/Marketplace.tsx'
 import PortfolioPage from './pages/investor/Portfolio.tsx'
 import OrderbookPage from './pages/investor/Orderbook.tsx'
 import InvestorProfile from './pages/investor/Profile.tsx'
+import InvestorDeposit from './pages/investor/Deposit.tsx'
 import UmkmDashboard from './pages/umkm/Dashboard.tsx'
 import UmkmListingForm from './pages/umkm/ListingForm.tsx'
 import UmkmListingDetail from './pages/umkm/ListingDetail.tsx'
@@ -30,6 +31,7 @@ function App() {
       <Route path="/investor/marketplace" element={<MarketplacePage />} />
       <Route path="/investor/portfolio" element={<PortfolioPage />} />
       <Route path="/investor/orderbook/:umkmId" element={<OrderbookPage />} />
+      <Route path="/investor/deposit" element={<InvestorDeposit />} />
       <Route path="/investor/profile" element={<InvestorProfile />} />
       
       {/* UMKM Routes */}

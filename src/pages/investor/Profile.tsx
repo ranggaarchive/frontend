@@ -3,7 +3,8 @@ import Layout from '@/components/Layout'
 import MobileHeader from '@/components/MobileHeader'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { User, Mail, Phone, Shield, Bell, HelpCircle, LogOut, ChevronRight } from 'lucide-react'
+import { User, Mail, Phone, Shield, Bell, HelpCircle, LogOut, ChevronRight, Wallet } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 export default function InvestorProfile() {
   const navigate = useNavigate()
@@ -37,6 +38,18 @@ export default function InvestorProfile() {
           <h3 className="font-semibold mb-3 px-1">Informasi Akun</h3>
           <Card>
             <CardContent className="pt-3 pb-3 divide-y">
+              <div className="flex items-center gap-3 py-3">
+                <Wallet className="h-5 w-5 text-gray-400" />
+                <div className="flex-1">
+                  <p className="text-xs text-gray-500">Saldo</p>
+                  <p className="font-medium">Rp 2.500.000</p>
+                </div>
+                <Link to="/investor/deposit">
+                  <Button size="sm" variant="outline">
+                    Deposit
+                  </Button>
+                </Link>
+              </div>
               <div className="flex items-center gap-3 py-3">
                 <Mail className="h-5 w-5 text-gray-400" />
                 <div className="flex-1">

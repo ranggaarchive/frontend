@@ -378,14 +378,14 @@ export default function OrderbookPage() {
       </div>
 
       {/* Fixed Bottom Action */}
-      <div className="fixed bottom-16 left-0 right-0 bg-white border-t p-4 z-40">
+      <div className="fixed bottom-16 left-1/2 -translate-x-1/2 w-full max-w-[480px] bg-white border-t p-4 z-40">
         <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
           <SheetTrigger asChild>
             <Button className="w-full h-12 text-base font-semibold">
               Trade Sekarang
             </Button>
           </SheetTrigger>
-          <SheetContent side="bottom" className="h-[85vh]">
+          <SheetContent side="bottom" className="h-[85vh] max-w-[480px] left-1/2 -translate-x-1/2">
             <SheetHeader className="mb-6">
               <SheetTitle>Buat Order</SheetTitle>
               <SheetDescription>Warung Makan Sederhana</SheetDescription>

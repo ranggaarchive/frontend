@@ -37,9 +37,12 @@ export default function InvestorDashboard() {
                 <p className="text-blue-100 text-sm mb-1">Total Portfolio</p>
                 <h2 className="text-3xl font-bold">Rp 125jt</h2>
               </div>
-              <Button size="icon" variant="ghost" className="text-white">
-                <Eye className="h-5 w-5" />
-              </Button>
+              <Link to="/investor/deposit">
+                <Button size="sm" variant="secondary" className="bg-white text-blue-600 hover:bg-gray-100">
+                  <Wallet className="h-4 w-4 mr-1" />
+                  Deposit
+                </Button>
+              </Link>
             </div>
             <div className="flex items-center gap-2 text-sm">
               <Badge className="bg-white/20 text-white border-0">
