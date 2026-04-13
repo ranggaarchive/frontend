@@ -26,7 +26,6 @@ export default function OrderbookPage() {
   const [orderType, setOrderType] = useState<'buy' | 'sell'>('buy')
   const [shares, setShares] = useState('')
   const [price, setPrice] = useState('')
-  const [timeframe, setTimeframe] = useState<'1D' | '1W' | '1M' | '3M' | '1Y'>('1W')
   const [sheetOpen, setSheetOpen] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [cancellingOrderId, setCancellingOrderId] = useState<number | null>(null)
