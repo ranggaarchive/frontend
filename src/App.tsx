@@ -1,4 +1,7 @@
 import { Routes, Route } from 'react-router-dom'
+import { Toaster } from 'sonner'
+import { AuthProvider } from './contexts/AuthContext'
+import ProtectedRoute from './components/ProtectedRoute'
 import HomePage from './pages/HomePage.tsx'
 import LoginPage from './pages/LoginPage.tsx'
 import RegisterPage from './pages/RegisterPage.tsx'
@@ -23,37 +26,180 @@ import AuditorProfile from './pages/auditor/Profile.tsx'
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<HomePage />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
-      
-      {/* Investor Routes */}
-      <Route path="/investor/dashboard" element={<InvestorDashboard />} />
-      <Route path="/investor/marketplace" element={<MarketplacePage />} />
-      <Route path="/investor/portfolio" element={<PortfolioPage />} />
-      <Route path="/investor/orderbook/:umkmId" element={<OrderbookPage />} />
-      <Route path="/investor/deposit" element={<InvestorDeposit />} />
-      <Route path="/investor/dividend" element={<InvestorDividend />} />
-      <Route path="/investor/profile" element={<InvestorProfile />} />
-      
-      {/* UMKM Routes */}
-      <Route path="/umkm/dashboard" element={<UmkmDashboard />} />
-      <Route path="/umkm/listing" element={<UmkmListingForm />} />
-      <Route path="/umkm/listing-detail" element={<UmkmListingDetail />} />
-      <Route path="/umkm/edit-listing" element={<UmkmListingForm />} />
-      <Route path="/umkm/reports" element={<UmkmReports />} />
-      <Route path="/umkm/investors" element={<UmkmInvestors />} />
-      <Route path="/umkm/dividend" element={<UmkmDividend />} />
-      <Route path="/umkm/profile" element={<UmkmProfile />} />
-      <Route path="/umkm/edit-profile" element={<UmkmProfile />} />
-      
-      {/* Auditor Routes */}
-      <Route path="/auditor/dashboard" element={<AuditorDashboard />} />
-      <Route path="/auditor/review/:umkmId" element={<AuditorReview />} />
-      <Route path="/auditor/approved" element={<AuditorApproved />} />
-      <Route path="/auditor/profile" element={<AuditorProfile />} />
-    </Routes>
+    <AuthProvider>
+      <Toaster position="top-center" richColors />
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        
+        {/* Investor Routes */}
+        <Route
+          path="/investor/dashboard"
+          element={
+            <ProtectedRoute allowedRoles={['investor']}>
+              <InvestorDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/investor/marketplace"
+          element={
+            <ProtectedRoute allowedRoles={['investor']}>
+              <MarketplacePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/investor/portfolio"
+          element={
+            <ProtectedRoute allowedRoles={['investor']}>
+              <PortfolioPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/investor/orderbook/:id"
+          element={
+            <ProtectedRoute allowedRoles={['investor']}>
+              <OrderbookPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/investor/deposit"
+          element={
+            <ProtectedRoute allowedRoles={['investor']}>
+              <InvestorDeposit />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/investor/dividend"
+          element={
+            <ProtectedRoute allowedRoles={['investor']}>
+              <InvestorDividend />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/investor/profile"
+          element={
+            <ProtectedRoute allowedRoles={['investor']}>
+              <InvestorProfile />
+            </ProtectedRoute>
+          }
+        />
+        
+        {/* UMKM Routes */}
+        <Route
+          path="/umkm/dashboard"
+          element={
+            <ProtectedRoute allowedRoles={['umkm']}>
+              <UmkmDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/umkm/listing"
+          element={
+            <ProtectedRoute allowedRoles={['umkm']}>
+              <UmkmListingForm />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/umkm/listing-detail"
+          element={
+            <ProtectedRoute allowedRoles={['umkm']}>
+              <UmkmListingDetail />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/umkm/edit-listing"
+          element={
+            <ProtectedRoute allowedRoles={['umkm']}>
+              <UmkmListingForm />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/umkm/reports"
+          element={
+            <ProtectedRoute allowedRoles={['umkm']}>
+              <UmkmReports />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/umkm/investors"
+          element={
+            <ProtectedRoute allowedRoles={['umkm']}>
+              <UmkmInvestors />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/umkm/dividend"
+          element={
+            <ProtectedRoute allowedRoles={['umkm']}>
+              <UmkmDividend />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/umkm/profile"
+          element={
+            <ProtectedRoute allowedRoles={['umkm']}>
+              <UmkmProfile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/umkm/edit-profile"
+          element={
+            <ProtectedRoute allowedRoles={['umkm']}>
+              <UmkmProfile />
+            </ProtectedRoute>
+          }
+        />
+        
+        {/* Auditor Routes */}
+        <Route
+          path="/auditor/dashboard"
+          element={
+            <ProtectedRoute allowedRoles={['auditor']}>
+              <AuditorDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/auditor/review/:umkmId"
+          element={
+            <ProtectedRoute allowedRoles={['auditor']}>
+              <AuditorReview />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/auditor/approved"
+          element={
+            <ProtectedRoute allowedRoles={['auditor']}>
+              <AuditorApproved />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/auditor/profile"
+          element={
+            <ProtectedRoute allowedRoles={['auditor']}>
+              <AuditorProfile />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </AuthProvider>
   )
 }
 

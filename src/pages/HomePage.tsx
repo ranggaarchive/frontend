@@ -1,11 +1,47 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import Layout from '@/components/Layout'
 import { TrendingUp, Building2, Shield, Users, BarChart3, CheckCircle, ArrowRight } from 'lucide-react'
+import statsService, { type PlatformStats } from '@/services/stats.service'
 
 export default function HomePage() {
+  const [stats, setStats] = useState<PlatformStats>({
+    totalBusinesses: 248,
+    totalInvestors: 15000,
+    totalInvestment: 125000000,
+    avgReturn: '18.5',
+    recentTransactions: 0,
+  })
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await statsService.getPublicStats()
+        setStats(response.data.stats)
+      } catch (error) {
+        console.error('Failed to fetch stats:', error)
+        // Keep default values on error
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchStats()
+  }, [])
+
+  const formatNumber = (num: number) => {
+    if (num >= 1000000) {
+      return `Rp ${(num / 1000000).toFixed(0)}M`
+    } else if (num >= 1000) {
+      return `${(num / 1000).toFixed(0)}K+`
+    }
+    return num.toString()
+  }
+
   return (
     <Layout>
       <div className="min-h-screen bg-gradient-to-br from-blue-600 to-purple-600">
@@ -19,7 +55,7 @@ export default function HomePage() {
               Investasi di UMKM Indonesia
             </h1>
             <p className="text-blue-100 mb-6 text-sm leading-relaxed">
-              Mulai dari Rp 25.000 dengan return hingga 18.5% per tahun
+              Mulai dari Rp 25.000 dengan return hingga {stats.avgReturn}% per tahun
             </p>
             <div className="flex flex-col gap-3">
               <Link to="/register" className="w-full">
@@ -44,28 +80,36 @@ export default function HomePage() {
             <Card className="bg-white/10 backdrop-blur border-white/20">
               <CardContent className="pt-4 pb-4 text-center">
                 <Building2 className="h-8 w-8 mx-auto mb-2 text-white" />
-                <p className="text-2xl font-bold text-white mb-0.5">248+</p>
+                <p className="text-2xl font-bold text-white mb-0.5">
+                  {loading ? '...' : `${stats.totalBusinesses}+`}
+                </p>
                 <p className="text-xs text-blue-100">UMKM Terdaftar</p>
               </CardContent>
             </Card>
             <Card className="bg-white/10 backdrop-blur border-white/20">
               <CardContent className="pt-4 pb-4 text-center">
                 <Users className="h-8 w-8 mx-auto mb-2 text-white" />
-                <p className="text-2xl font-bold text-white mb-0.5">15K+</p>
+                <p className="text-2xl font-bold text-white mb-0.5">
+                  {loading ? '...' : formatNumber(stats.totalInvestors)}
+                </p>
                 <p className="text-xs text-blue-100">Investor Aktif</p>
               </CardContent>
             </Card>
             <Card className="bg-white/10 backdrop-blur border-white/20">
               <CardContent className="pt-4 pb-4 text-center">
                 <TrendingUp className="h-8 w-8 mx-auto mb-2 text-white" />
-                <p className="text-2xl font-bold text-white mb-0.5">Rp 125M</p>
+                <p className="text-2xl font-bold text-white mb-0.5">
+                  {loading ? '...' : formatNumber(stats.totalInvestment)}
+                </p>
                 <p className="text-xs text-blue-100">Total Investasi</p>
               </CardContent>
             </Card>
             <Card className="bg-white/10 backdrop-blur border-white/20">
               <CardContent className="pt-4 pb-4 text-center">
                 <BarChart3 className="h-8 w-8 mx-auto mb-2 text-white" />
-                <p className="text-2xl font-bold text-white mb-0.5">18.5%</p>
+                <p className="text-2xl font-bold text-white mb-0.5">
+                  {loading ? '...' : `${stats.avgReturn}%`}
+                </p>
                 <p className="text-xs text-blue-100">Avg Return</p>
               </CardContent>
             </Card>

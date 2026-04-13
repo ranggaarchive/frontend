@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
+import { useAuth } from '@/contexts/AuthContext'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -7,16 +8,35 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import Layout from '@/components/Layout'
 import { Building2 } from 'lucide-react'
+import { toast } from 'sonner'
 
 export default function LoginPage() {
-  const navigate = useNavigate()
-  const [role, setRole] = useState<string>('')
+  const { login } = useAuth()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [role, setRole] = useState<'investor' | 'umkm' | 'auditor' | ''>('')
+  const [loading, setLoading] = useState(false)
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (role === 'investor') navigate('/investor/dashboard')
-    else if (role === 'umkm') navigate('/umkm/dashboard')
-    else if (role === 'auditor') navigate('/auditor/dashboard')
+    
+    if (!role) {
+      toast.error('Pilih role terlebih dahulu')
+      return
+    }
+
+    setLoading(true)
+    
+    try {
+      await login({ email, password, role })
+      toast.success('Login berhasil!')
+    } catch (error: any) {
+      console.error('Login error:', error)
+      const message = error.response?.data?.message || 'Login gagal. Periksa email dan password Anda.'
+      toast.error(message)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -40,7 +60,10 @@ export default function LoginPage() {
                 id="email" 
                 type="email" 
                 placeholder="email@example.com" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required 
+                disabled={loading}
                 className="h-12 text-base"
               />
             </div>
@@ -50,13 +73,16 @@ export default function LoginPage() {
                 id="password" 
                 type="password" 
                 placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 required 
+                disabled={loading}
                 className="h-12 text-base"
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="role" className="text-base">Masuk Sebagai</Label>
-              <Select value={role} onValueChange={setRole} required>
+              <Select value={role} onValueChange={(value: any) => setRole(value)} required disabled={loading}>
                 <SelectTrigger className="h-12 text-base">
                   <SelectValue placeholder="Pilih role" />
                 </SelectTrigger>
@@ -67,8 +93,8 @@ export default function LoginPage() {
                 </SelectContent>
               </Select>
             </div>
-            <Button type="submit" className="w-full h-12 text-base font-semibold mt-6">
-              Masuk
+            <Button type="submit" className="w-full h-12 text-base font-semibold mt-6" disabled={loading}>
+              {loading ? 'Memproses...' : 'Masuk'}
             </Button>
           </form>
 

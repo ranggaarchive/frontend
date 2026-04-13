@@ -1,11 +1,15 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Layout from '@/components/Layout'
 import MobileHeader from '@/components/MobileHeader'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Wallet, CreditCard, Building2, CheckCircle, AlertCircle, ArrowRight } from 'lucide-react'
+import { Wallet, CreditCard, Building2, CheckCircle, AlertCircle, ArrowRight, Loader2 } from 'lucide-react'
+import depositService from '@/services/deposit.service'
+import investorService, { type UserProfile } from '@/services/investor.service'
+import { toast } from 'sonner'
+import { useNavigate } from 'react-router-dom'
 
 const paymentMethods = [
   { id: 'bca', name: 'BCA Virtual Account', icon: Building2, fee: 0 },
@@ -21,19 +25,76 @@ const paymentMethods = [
 const quickAmounts = [100000, 500000, 1000000, 5000000]
 
 export default function InvestorDeposit() {
+  const navigate = useNavigate()
+  const [loading, setLoading] = useState(true)
+  const [submitting, setSubmitting] = useState(false)
+  const [profile, setProfile] = useState<UserProfile | null>(null)
   const [amount, setAmount] = useState('')
   const [selectedMethod, setSelectedMethod] = useState('')
 
-  const handleDeposit = (e: React.FormEvent) => {
+  useEffect(() => {
+    loadProfile()
+  }, [])
+
+  const loadProfile = async () => {
+    try {
+      setLoading(true)
+      const data = await investorService.getProfile()
+      setProfile(data)
+    } catch (error: any) {
+      console.error('Failed to load profile:', error)
+      toast.error('Gagal memuat profil')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleDeposit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Simulasi redirect ke Midtrans
-    alert(`Redirect ke Midtrans untuk deposit Rp ${parseInt(amount).toLocaleString()} via ${selectedMethod}`)
-    // TODO: Integrate with Midtrans
-    // window.location.href = midtransPaymentUrl
+    
+    if (!amount || !selectedMethod) return
+
+    try {
+      setSubmitting(true)
+      const result = await depositService.createDeposit({
+        amount: parseInt(amount),
+        paymentMethod: selectedMethod,
+      })
+      
+      toast.success(`Deposit berhasil! Saldo baru: Rp ${result.newBalance.toLocaleString('id-ID')}`)
+      
+      // Reload profile to get updated balance
+      await loadProfile()
+      
+      // Reset form
+      setAmount('')
+      setSelectedMethod('')
+      
+      // Redirect to profile after 1 second
+      setTimeout(() => {
+        navigate('/investor/profile')
+      }, 1000)
+    } catch (error: any) {
+      console.error('Deposit error:', error)
+      toast.error(error.response?.data?.message || 'Gagal melakukan deposit')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   const selectedPayment = paymentMethods.find(m => m.id === selectedMethod)
   const totalAmount = amount ? parseInt(amount) + (selectedPayment?.fee ? parseInt(amount) * selectedPayment.fee / 100 : 0) : 0
+
+  if (loading) {
+    return (
+      <Layout role="investor">
+        <MobileHeader title="Deposit" showBack />
+        <div className="flex items-center justify-center h-[calc(100vh-200px)]">
+          <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        </div>
+      </Layout>
+    )
+  }
 
   return (
     <Layout role="investor">
@@ -44,7 +105,9 @@ export default function InvestorDeposit() {
         <Card className="bg-gradient-to-br from-blue-600 to-purple-600 text-white border-0">
           <CardContent className="pt-5 pb-5">
             <p className="text-blue-100 text-sm mb-1">Saldo Tersedia</p>
-            <h2 className="text-3xl font-bold mb-3">Rp 2.500.000</h2>
+            <h2 className="text-3xl font-bold mb-3">
+              Rp {profile?.balance.toLocaleString('id-ID') || '0'}
+            </h2>
             <div className="flex items-center gap-2 text-sm">
               <CheckCircle className="h-4 w-4" />
               <span>Verified Account</span>
@@ -175,10 +238,19 @@ export default function InvestorDeposit() {
           <Button
             type="submit"
             className="w-full h-12 text-base font-semibold"
-            disabled={!amount || !selectedMethod || parseInt(amount) < 100000}
+            disabled={!amount || !selectedMethod || parseInt(amount) < 100000 || submitting}
           >
-            Lanjutkan ke Pembayaran
-            <ArrowRight className="ml-2 h-5 w-5" />
+            {submitting ? (
+              <>
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                Memproses...
+              </>
+            ) : (
+              <>
+                Lanjutkan ke Pembayaran
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </>
+            )}
           </Button>
         </form>
       </div>
