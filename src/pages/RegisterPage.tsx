@@ -7,19 +7,121 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import Layout from '@/components/Layout'
-import { Building2, CheckCircle, ArrowRight } from 'lucide-react'
+import { Building2, CheckCircle, ArrowRight, Loader2 } from 'lucide-react'
+import authService, { type RegisterRequest } from '@/services/auth.service'
+import { toast } from 'sonner'
 
 export default function RegisterPage() {
   const navigate = useNavigate()
-  const [role, setRole] = useState<string>('')
+  const [role, setRole] = useState<'investor' | 'umkm' | 'auditor' | ''>('')
   const [step, setStep] = useState(1)
+  const [loading, setLoading] = useState(false)
+  
+  // Step 1 form data
+  const [formData, setFormData] = useState({
+    fullName: '',
+    email: '',
+    phone: '',
+    password: '',
+    passwordConfirmation: '',
+  })
+  
+  // Step 2 form data (UMKM)
+  const [businessData, setBusinessData] = useState({
+    businessName: '',
+    category: '' as 'fb' | 'retail' | 'fashion' | 'service' | 'manufacture' | '',
+    description: '',
+    address: '',
+    annualRevenue: '',
+    employees: '',
+  })
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleStep1Change = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.id]: e.target.value,
+    })
+  }
+
+  const handleStep2Change = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setBusinessData({
+      ...businessData,
+      [e.target.id]: e.target.value,
+    })
+  }
+
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    if (!role) {
+      toast.error('Pilih role terlebih dahulu')
+      return
+    }
+    
     if (role === 'umkm' && step === 1) {
+      // Validate step 1 before going to step 2
+      if (formData.password !== formData.passwordConfirmation) {
+        toast.error('Password tidak cocok')
+        return
+      }
+      if (formData.password.length < 8) {
+        toast.error('Password minimal 8 karakter')
+        return
+      }
       setStep(2)
-    } else {
-      navigate('/login')
+      return
+    }
+
+    // Validate password for non-UMKM
+    if (step === 1) {
+      if (formData.password !== formData.passwordConfirmation) {
+        toast.error('Password tidak cocok')
+        return
+      }
+      if (formData.password.length < 8) {
+        toast.error('Password minimal 8 karakter')
+        return
+      }
+    }
+
+    try {
+      setLoading(true)
+      
+      const registerData: RegisterRequest = {
+        fullName: formData.fullName,
+        email: formData.email,
+        password: formData.password,
+        phone: formData.phone,
+        role: role as 'investor' | 'umkm' | 'auditor',
+      }
+
+      // Add business data for UMKM
+      if (role === 'umkm' && step === 2) {
+        registerData.businessName = businessData.businessName
+        registerData.category = businessData.category as 'fb' | 'retail' | 'fashion' | 'service' | 'manufacture'
+        registerData.description = businessData.description
+        registerData.address = businessData.address
+        registerData.annualRevenue = Number(businessData.annualRevenue)
+        registerData.employees = Number(businessData.employees)
+      }
+
+      const response = await authService.register(registerData)
+      
+      toast.success(response.message || 'Registrasi berhasil!')
+      
+      // Redirect based on role
+      if (role === 'investor') {
+        navigate('/investor/dashboard')
+      } else if (role === 'umkm') {
+        navigate('/umkm/dashboard')
+      } else if (role === 'auditor') {
+        navigate('/auditor/dashboard')
+      }
+    } catch (error: any) {
+      console.error('Registration error:', error)
+      toast.error(error.response?.data?.message || 'Registrasi gagal. Silakan coba lagi.')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -46,12 +148,14 @@ export default function RegisterPage() {
           {step === 1 ? (
             <form onSubmit={handleRegister} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name" className="text-base">Nama Lengkap</Label>
+                <Label htmlFor="fullName" className="text-base">Nama Lengkap</Label>
                 <Input 
-                  id="name" 
+                  id="fullName" 
                   placeholder="Nama Anda" 
                   required 
                   className="h-12 text-base"
+                  value={formData.fullName}
+                  onChange={handleStep1Change}
                 />
               </div>
               <div className="space-y-2">
@@ -62,6 +166,8 @@ export default function RegisterPage() {
                   placeholder="email@example.com" 
                   required 
                   className="h-12 text-base"
+                  value={formData.email}
+                  onChange={handleStep1Change}
                 />
               </div>
               <div className="space-y-2">
@@ -72,6 +178,8 @@ export default function RegisterPage() {
                   placeholder="08123456789" 
                   required 
                   className="h-12 text-base"
+                  value={formData.phone}
+                  onChange={handleStep1Change}
                 />
               </div>
               <div className="space-y-2">
@@ -82,11 +190,28 @@ export default function RegisterPage() {
                   placeholder="••••••••"
                   required 
                   className="h-12 text-base"
+                  minLength={8}
+                  value={formData.password}
+                  onChange={handleStep1Change}
+                />
+                <p className="text-xs text-gray-500">Minimal 8 karakter</p>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="passwordConfirmation" className="text-base">Konfirmasi Password</Label>
+                <Input 
+                  id="passwordConfirmation" 
+                  type="password" 
+                  placeholder="••••••••"
+                  required 
+                  className="h-12 text-base"
+                  minLength={8}
+                  value={formData.passwordConfirmation}
+                  onChange={handleStep1Change}
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="role" className="text-base">Daftar Sebagai</Label>
-                <Select value={role} onValueChange={setRole} required>
+                <Select value={role} onValueChange={(v) => setRole(v as any)} required>
                   <SelectTrigger className="h-12 text-base">
                     <SelectValue placeholder="Pilih role" />
                   </SelectTrigger>
@@ -97,9 +222,22 @@ export default function RegisterPage() {
                   </SelectContent>
                 </Select>
               </div>
-              <Button type="submit" className="w-full h-12 text-base font-semibold mt-6">
-                {role === 'umkm' ? 'Lanjutkan' : 'Daftar'}
-                {role === 'umkm' && <ArrowRight className="ml-2 h-5 w-5" />}
+              <Button 
+                type="submit" 
+                className="w-full h-12 text-base font-semibold mt-6"
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    Memproses...
+                  </>
+                ) : (
+                  <>
+                    {role === 'umkm' ? 'Lanjutkan' : 'Daftar'}
+                    {role === 'umkm' && <ArrowRight className="ml-2 h-5 w-5" />}
+                  </>
+                )}
               </Button>
             </form>
           ) : (
@@ -111,11 +249,17 @@ export default function RegisterPage() {
                   placeholder="Nama usaha Anda" 
                   required 
                   className="h-12 text-base"
+                  value={businessData.businessName}
+                  onChange={handleStep2Change}
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="category" className="text-base">Kategori Usaha</Label>
-                <Select required>
+                <Select 
+                  value={businessData.category} 
+                  onValueChange={(v) => setBusinessData({ ...businessData, category: v as any })}
+                  required
+                >
                   <SelectTrigger className="h-12 text-base">
                     <SelectValue placeholder="Pilih kategori" />
                   </SelectTrigger>
@@ -136,6 +280,8 @@ export default function RegisterPage() {
                   rows={3}
                   required
                   className="text-base"
+                  value={businessData.description}
+                  onChange={handleStep2Change}
                 />
               </div>
               <div className="space-y-2">
@@ -146,17 +292,21 @@ export default function RegisterPage() {
                   rows={2} 
                   required 
                   className="text-base"
+                  value={businessData.address}
+                  onChange={handleStep2Change}
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
-                  <Label htmlFor="revenue" className="text-base">Omzet/Tahun</Label>
+                  <Label htmlFor="annualRevenue" className="text-base">Omzet/Tahun</Label>
                   <Input 
-                    id="revenue" 
+                    id="annualRevenue" 
                     type="number" 
                     placeholder="500000000" 
                     required 
                     className="h-12 text-base"
+                    value={businessData.annualRevenue}
+                    onChange={handleStep2Change}
                   />
                 </div>
                 <div className="space-y-2">
@@ -167,26 +317,10 @@ export default function RegisterPage() {
                     placeholder="10" 
                     required 
                     className="h-12 text-base"
+                    value={businessData.employees}
+                    onChange={handleStep2Change}
                   />
                 </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="siup" className="text-base">Izin Usaha (SIUP/NIB)</Label>
-                <Input 
-                  id="siup" 
-                  type="file" 
-                  required 
-                  className="h-12 text-base"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="financialReport" className="text-base">Laporan Keuangan</Label>
-                <Input 
-                  id="financialReport" 
-                  type="file" 
-                  required 
-                  className="h-12 text-base"
-                />
               </div>
               <div className="flex gap-3 mt-6">
                 <Button 
@@ -194,11 +328,23 @@ export default function RegisterPage() {
                   variant="outline" 
                   className="flex-1 h-12 text-base"
                   onClick={() => setStep(1)}
+                  disabled={loading}
                 >
                   Kembali
                 </Button>
-                <Button type="submit" className="flex-1 h-12 text-base font-semibold">
-                  Daftar
+                <Button 
+                  type="submit" 
+                  className="flex-1 h-12 text-base font-semibold"
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      Memproses...
+                    </>
+                  ) : (
+                    'Daftar'
+                  )}
                 </Button>
               </div>
             </form>
