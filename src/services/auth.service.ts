@@ -18,7 +18,12 @@ export interface RegisterRequest {
   description?: string
   address?: string
   annualRevenue?: number
+  netProfit?: number
+  totalAssets?: number
   employees?: number
+  totalShares?: number
+  sharesPercentage?: number
+  pricePerShare?: number
 }
 
 export interface User {
@@ -58,7 +63,53 @@ class AuthService {
   /**
    * Register new user
    */
-  async register(data: RegisterRequest): Promise<AuthResponse> {
+  async register(data: RegisterRequest, files?: {
+    businessLicense?: File
+    financialReport?: File
+    taxReport?: File
+    ownerIdCard?: File
+  }): Promise<AuthResponse> {
+    // If files are provided, use FormData
+    if (files && Object.keys(files).length > 0) {
+      const formData = new FormData()
+      
+      // Append all text fields
+      Object.entries(data).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          formData.append(key, value.toString())
+        }
+      })
+      
+      // Append files
+      if (files.businessLicense) {
+        formData.append('businessLicense', files.businessLicense)
+      }
+      if (files.financialReport) {
+        formData.append('financialReport', files.financialReport)
+      }
+      if (files.taxReport) {
+        formData.append('taxReport', files.taxReport)
+      }
+      if (files.ownerIdCard) {
+        formData.append('ownerIdCard', files.ownerIdCard)
+      }
+      
+      const response = await api.post<AuthResponse>('/auth/register', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+      
+      // Save token and user to localStorage
+      if (response.data.data.token) {
+        localStorage.setItem('auth_token', response.data.data.token)
+        localStorage.setItem('user', JSON.stringify(response.data.data.user))
+      }
+      
+      return response.data
+    }
+    
+    // Otherwise use regular JSON
     const response = await api.post<AuthResponse>('/auth/register', data)
     
     // Save token and user to localStorage

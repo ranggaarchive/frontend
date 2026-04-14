@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Layout from '@/components/Layout'
 import MobileHeader from '@/components/MobileHeader'
@@ -6,21 +6,78 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
-import { Users, TrendingUp, FileText, CheckCircle, ArrowUpRight, Upload, Edit, Clock, AlertCircle, Eye, DollarSign } from 'lucide-react'
-
-const priceHistory = [
-  { month: 'Jan', price: 45000 },
-  { month: 'Feb', price: 47000 },
-  { month: 'Mar', price: 48500 },
-  { month: 'Apr', price: 50000 },
-]
+import { Users, TrendingUp, CheckCircle, ArrowUpRight, Edit, Clock, AlertCircle, Eye, DollarSign, Loader2, ArrowDownRight } from 'lucide-react'
+import umkmService, { type DashboardData } from '@/services/umkm.service'
+import { toast } from 'sonner'
 
 export default function UmkmDashboard() {
-  // Simulasi status: 'pending' | 'approved' | 'rejected'
-  const [listingStatus] = useState<'pending' | 'approved' | 'rejected'>('pending')
+  const [loading, setLoading] = useState(true)
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null)
+
+  useEffect(() => {
+    loadDashboard()
+  }, [])
+
+  const loadDashboard = async () => {
+    try {
+      setLoading(true)
+      const data = await umkmService.getDashboard()
+      setDashboardData(data)
+    } catch (error: any) {
+      console.error('Failed to load dashboard:', error)
+      toast.error('Gagal memuat dashboard')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <Layout role="umkm">
+        <MobileHeader title="Home" showNotification />
+        <div className="flex items-center justify-center h-[calc(100vh-200px)]">
+          <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        </div>
+      </Layout>
+    )
+  }
+
+  if (!dashboardData?.hasBusiness) {
+    return (
+      <Layout role="umkm">
+        <MobileHeader title="Home" showNotification />
+        <div className="px-4 py-4 space-y-4">
+          <Card className="bg-gradient-to-r from-blue-500 to-purple-500 text-white border-0">
+            <CardContent className="pt-5 pb-5">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="h-10 w-10 flex-shrink-0" />
+                <div className="flex-1">
+                  <h3 className="font-bold text-lg mb-1">Belum Ada Usaha</h3>
+                  <p className="text-sm text-blue-50 mb-3">
+                    Anda belum mendaftarkan usaha. Silakan lengkapi data usaha Anda untuk mulai listing.
+                  </p>
+                  <Link to="/umkm/listing-form">
+                    <Button variant="secondary" size="sm">
+                      Daftar Usaha
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </Layout>
+    )
+  }
+
+  const { business, stats, priceHistory } = dashboardData
+  
+  if (!business) {
+    return null
+  }
 
   // Jika masih pending review
-  if (listingStatus === 'pending') {
+  if (business.status === 'pending') {
     return (
       <Layout role="umkm">
         <MobileHeader title="Home" showNotification />
@@ -38,7 +95,7 @@ export default function UmkmDashboard() {
                   </p>
                   <div className="flex items-center gap-2 text-sm">
                     <div className="h-2 w-2 bg-white rounded-full animate-pulse"></div>
-                    <span>Diajukan 2 hari yang lalu</span>
+                    <span>Diajukan {business.createdAt}</span>
                   </div>
                 </div>
               </div>
@@ -50,7 +107,7 @@ export default function UmkmDashboard() {
             <CardContent className="pt-5 pb-5">
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <h2 className="text-xl font-bold mb-1">Warung Makan Sederhana</h2>
+                  <h2 className="text-xl font-bold mb-1">{business.name}</h2>
                   <Badge variant="secondary" className="bg-yellow-100 text-yellow-700 border-0">
                     <Clock className="h-3 w-3 mr-1" />
                     Pending Review
@@ -66,70 +123,23 @@ export default function UmkmDashboard() {
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between py-2 border-b">
                   <span className="text-gray-600">Kategori</span>
-                  <span className="font-medium">Food & Beverage</span>
+                  <span className="font-medium capitalize">{business.category}</span>
                 </div>
                 <div className="flex justify-between py-2 border-b">
                   <span className="text-gray-600">Omzet Tahunan</span>
-                  <span className="font-medium">Rp 600jt</span>
+                  <span className="font-medium">Rp {(business.annualRevenue / 1000000).toFixed(0)}jt</span>
                 </div>
                 <div className="flex justify-between py-2 border-b">
                   <span className="text-gray-600">Karyawan</span>
-                  <span className="font-medium">12 Orang</span>
+                  <span className="font-medium">{business.employees} Orang</span>
                 </div>
                 <div className="flex justify-between py-2">
                   <span className="text-gray-600">Alamat</span>
-                  <span className="font-medium text-right">Jl. Raya Bogor No. 123</span>
+                  <span className="font-medium text-right">{business.address}</span>
                 </div>
               </div>
             </CardContent>
           </Card>
-
-          {/* Documents Status */}
-          <Card>
-            <CardContent className="pt-5 pb-5">
-              <h3 className="font-semibold mb-4">Dokumen yang Diupload</h3>
-              <div className="space-y-3">
-                {[
-                  { name: 'Izin Usaha (SIUP/NIB)', status: 'uploaded' },
-                  { name: 'Laporan Keuangan', status: 'uploaded' },
-                  { name: 'NPWP & SPT', status: 'uploaded' },
-                  { name: 'KTP Pemilik', status: 'uploaded' },
-                ].map((doc) => (
-                  <div key={doc.name} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <FileText className="h-5 w-5 text-gray-400" />
-                      <span className="text-sm font-medium">{doc.name}</span>
-                    </div>
-                    <CheckCircle className="h-5 w-5 text-green-600" />
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Action Buttons */}
-          <div className="grid grid-cols-2 gap-3">
-            <Link to="/umkm/listing-detail">
-              <Card className="hover:shadow-md transition-shadow">
-                <CardContent className="pt-5 pb-5 text-center">
-                  <div className="h-12 w-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-2">
-                    <Eye className="h-6 w-6 text-blue-600" />
-                  </div>
-                  <p className="font-medium text-sm">Lihat Detail</p>
-                </CardContent>
-              </Card>
-            </Link>
-            <Link to="/umkm/edit-listing">
-              <Card className="hover:shadow-md transition-shadow">
-                <CardContent className="pt-5 pb-5 text-center">
-                  <div className="h-12 w-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-2">
-                    <Edit className="h-6 w-6 text-green-600" />
-                  </div>
-                  <p className="font-medium text-sm">Edit Data</p>
-                </CardContent>
-              </Card>
-            </Link>
-          </div>
 
           {/* Info Card */}
           <Card className="bg-blue-50 border-blue-200">
@@ -153,6 +163,10 @@ export default function UmkmDashboard() {
   }
 
   // Jika sudah approved (tampilan normal)
+  const formatCurrency = (value: number) => {
+    return `Rp ${(value / 1000).toFixed(0)}k`
+  }
+
   return (
     <Layout role="umkm">
       <MobileHeader title="Home" showNotification />
@@ -163,7 +177,7 @@ export default function UmkmDashboard() {
           <CardContent className="pt-5 pb-5">
             <div className="flex items-start justify-between mb-4">
               <div>
-                <h2 className="text-xl font-bold mb-1">Warung Makan Sederhana</h2>
+                <h2 className="text-xl font-bold mb-1">{business.name}</h2>
                 <Badge className="bg-white/20 text-white border-0">
                   <CheckCircle className="h-3 w-3 mr-1" />
                   Verified
@@ -173,13 +187,22 @@ export default function UmkmDashboard() {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <p className="text-green-100 text-xs mb-1">Harga Saham</p>
-                <p className="text-2xl font-bold">Rp 50k</p>
+                <p className="text-2xl font-bold">{formatCurrency(business.pricePerShare)}</p>
               </div>
               <div>
                 <p className="text-green-100 text-xs mb-1">Perubahan</p>
                 <div className="flex items-center gap-1">
-                  <ArrowUpRight className="h-4 w-4" />
-                  <p className="text-2xl font-bold">+8.2%</p>
+                  {stats && stats.priceChange >= 0 ? (
+                    <>
+                      <ArrowUpRight className="h-4 w-4" />
+                      <p className="text-2xl font-bold">+{stats.priceChange.toFixed(1)}%</p>
+                    </>
+                  ) : (
+                    <>
+                      <ArrowDownRight className="h-4 w-4" />
+                      <p className="text-2xl font-bold">{stats?.priceChange.toFixed(1)}%</p>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
@@ -191,74 +214,86 @@ export default function UmkmDashboard() {
           <Card>
             <CardContent className="pt-4 pb-4">
               <Users className="h-8 w-8 text-blue-600 mb-2" />
-              <p className="text-2xl font-bold mb-1">248</p>
+              <p className="text-2xl font-bold mb-1">{stats?.totalInvestors || 0}</p>
               <p className="text-xs text-gray-600">Total Investor</p>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="pt-4 pb-4">
               <TrendingUp className="h-8 w-8 text-green-600 mb-2" />
-              <p className="text-2xl font-bold mb-1">Rp 500jt</p>
+              <p className="text-2xl font-bold mb-1">
+                Rp {stats ? (stats.marketCap / 1000000).toFixed(0) : 0}jt
+              </p>
               <p className="text-xs text-gray-600">Market Cap</p>
             </CardContent>
           </Card>
         </div>
 
         {/* Price Chart */}
-        <Card>
-          <CardContent className="pt-5 pb-4">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h3 className="font-semibold">Harga Saham</h3>
-                <p className="text-xs text-gray-500">4 bulan terakhir</p>
+        {priceHistory && priceHistory.length > 0 && (
+          <Card>
+            <CardContent className="pt-5 pb-4">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="font-semibold">Harga Saham</h3>
+                  <p className="text-xs text-gray-500">Beberapa bulan terakhir</p>
+                </div>
+                {stats && (
+                  <Badge variant="secondary" className={`${
+                    stats.priceChange >= 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                  } border-0`}>
+                    {stats.priceChange >= 0 ? (
+                      <TrendingUp className="h-3 w-3 mr-1" />
+                    ) : (
+                      <ArrowDownRight className="h-3 w-3 mr-1" />
+                    )}
+                    {stats.priceChange >= 0 ? '+' : ''}{stats.priceChange.toFixed(1)}%
+                  </Badge>
+                )}
               </div>
-              <Badge variant="secondary" className="bg-green-100 text-green-700 border-0">
-                <TrendingUp className="h-3 w-3 mr-1" />
-                +11.1%
-              </Badge>
-            </div>
-            <ResponsiveContainer width="100%" height={160}>
-              <LineChart data={priceHistory}>
-                <XAxis 
-                  dataKey="month" 
-                  stroke="#9ca3af"
-                  style={{ fontSize: '11px' }}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <YAxis hide />
-                <Tooltip 
-                  formatter={(value) => [`Rp ${Number(value).toLocaleString()}`, 'Harga']}
-                  contentStyle={{ 
-                    backgroundColor: 'white', 
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '8px',
-                    fontSize: '12px'
-                  }}
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="price" 
-                  stroke="#10b981" 
-                  strokeWidth={3}
-                  dot={false}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+              <ResponsiveContainer width="100%" height={160}>
+                <LineChart data={priceHistory}>
+                  <XAxis 
+                    dataKey="month" 
+                    stroke="#9ca3af"
+                    style={{ fontSize: '11px' }}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <YAxis hide />
+                  <Tooltip 
+                    formatter={(value) => [`Rp ${Number(value).toLocaleString()}`, 'Harga']}
+                    contentStyle={{ 
+                      backgroundColor: 'white', 
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '8px',
+                      fontSize: '12px'
+                    }}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="price" 
+                    stroke={stats && stats.priceChange >= 0 ? '#10b981' : '#ef4444'}
+                    strokeWidth={3}
+                    dot={false}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Quick Actions */}
         <div>
           <h3 className="font-semibold mb-3">Quick Actions</h3>
           <div className="grid grid-cols-3 gap-3">
-            <Link to="/umkm/reports">
+            <Link to="/umkm/investors">
               <Card className="hover:shadow-md transition-shadow">
                 <CardContent className="pt-5 pb-5 text-center">
                   <div className="h-12 w-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-2">
-                    <Upload className="h-6 w-6 text-blue-600" />
+                    <Users className="h-6 w-6 text-blue-600" />
                   </div>
-                  <p className="font-medium text-xs">Upload Laporan</p>
+                  <p className="font-medium text-xs">Investor</p>
                 </CardContent>
               </Card>
             </Link>
@@ -272,7 +307,7 @@ export default function UmkmDashboard() {
                 </CardContent>
               </Card>
             </Link>
-            <Link to="/umkm/edit-profile">
+            <Link to="/umkm/listing-detail">
               <Card className="hover:shadow-md transition-shadow">
                 <CardContent className="pt-5 pb-5 text-center">
                   <div className="h-12 w-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-2">
@@ -306,49 +341,17 @@ export default function UmkmDashboard() {
                   </div>
                   <div className="flex items-center justify-between p-2 bg-white rounded-lg">
                     <span className="text-xs font-medium">Tanggal Listing</span>
-                    <span className="text-xs text-gray-600">15 Jan 2026</span>
+                    <span className="text-xs text-gray-600">{business.createdAt}</span>
                   </div>
                   <div className="flex items-center justify-between p-2 bg-white rounded-lg">
-                    <span className="text-xs font-medium">Laporan Terakhir</span>
-                    <span className="text-xs text-gray-600">Q4 2025</span>
+                    <span className="text-xs font-medium">Total Investor</span>
+                    <span className="text-xs text-gray-600">{stats?.totalInvestors || 0} Investor</span>
                   </div>
                 </div>
               </div>
             </div>
           </CardContent>
         </Card>
-
-        {/* Recent Reports */}
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-semibold">Laporan Terbaru</h3>
-            <Link to="/umkm/reports">
-              <Button variant="ghost" size="sm" className="text-blue-600 h-8">
-                Lihat Semua
-              </Button>
-            </Link>
-          </div>
-          <div className="space-y-3">
-            {['Q4 2025', 'Q3 2025'].map((period) => (
-              <Card key={period}>
-                <CardContent className="pt-4 pb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <FileText className="h-5 w-5 text-blue-600" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-medium text-sm">{period}</p>
-                      <p className="text-xs text-gray-500">Laporan Keuangan</p>
-                    </div>
-                    <Badge variant="secondary" className="bg-green-100 text-green-700 border-0 text-xs">
-                      Approved
-                    </Badge>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
       </div>
     </Layout>
   )

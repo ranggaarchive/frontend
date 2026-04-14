@@ -33,7 +33,20 @@ export default function RegisterPage() {
     description: '',
     address: '',
     annualRevenue: '',
+    netProfit: '',
+    totalAssets: '',
     employees: '',
+  })
+
+  // Step 3 form data (UMKM - Saham & Dokumen)
+  const [shareData, setShareData] = useState({
+    totalShares: '',
+    sharesPercentage: '',
+    pricePerShare: '',
+    businessLicense: null as File | null,
+    financialReport: null as File | null,
+    taxReport: null as File | null,
+    ownerIdCard: null as File | null,
   })
 
   const handleStep1Change = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,6 +60,21 @@ export default function RegisterPage() {
     setBusinessData({
       ...businessData,
       [e.target.id]: e.target.value,
+    })
+  }
+
+  const handleStep3Change = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setShareData({
+      ...shareData,
+      [e.target.id]: e.target.value,
+    })
+  }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, fieldName: string) => {
+    const file = e.target.files?.[0] || null
+    setShareData({
+      ...shareData,
+      [fieldName]: file,
     })
   }
 
@@ -72,14 +100,36 @@ export default function RegisterPage() {
       return
     }
 
+    if (role === 'umkm' && step === 2) {
+      // Validate step 2 before going to step 3
+      if (!businessData.businessName || !businessData.category || !businessData.description) {
+        toast.error('Lengkapi semua data usaha')
+        return
+      }
+      setStep(3)
+      return
+    }
+
     // Validate password for non-UMKM
-    if (step === 1) {
+    if (step === 1 && role !== 'umkm') {
       if (formData.password !== formData.passwordConfirmation) {
         toast.error('Password tidak cocok')
         return
       }
       if (formData.password.length < 8) {
         toast.error('Password minimal 8 karakter')
+        return
+      }
+    }
+
+    // Validate step 3 for UMKM
+    if (role === 'umkm' && step === 3) {
+      if (!shareData.totalShares || !shareData.sharesPercentage || !shareData.pricePerShare) {
+        toast.error('Lengkapi konfigurasi saham')
+        return
+      }
+      if (!shareData.businessLicense || !shareData.financialReport || !shareData.taxReport || !shareData.ownerIdCard) {
+        toast.error('Upload semua dokumen yang diperlukan')
         return
       }
     }
@@ -96,16 +146,26 @@ export default function RegisterPage() {
       }
 
       // Add business data for UMKM
-      if (role === 'umkm' && step === 2) {
+      if (role === 'umkm' && step === 3) {
         registerData.businessName = businessData.businessName
         registerData.category = businessData.category as 'fb' | 'retail' | 'fashion' | 'service' | 'manufacture'
         registerData.description = businessData.description
         registerData.address = businessData.address
         registerData.annualRevenue = Number(businessData.annualRevenue)
+        registerData.netProfit = Number(businessData.netProfit)
+        registerData.totalAssets = Number(businessData.totalAssets)
         registerData.employees = Number(businessData.employees)
+        registerData.totalShares = Number(shareData.totalShares)
+        registerData.sharesPercentage = Number(shareData.sharesPercentage)
+        registerData.pricePerShare = Number(shareData.pricePerShare)
       }
 
-      const response = await authService.register(registerData)
+      const response = await authService.register(registerData, {
+        businessLicense: shareData.businessLicense || undefined,
+        financialReport: shareData.financialReport || undefined,
+        taxReport: shareData.taxReport || undefined,
+        ownerIdCard: shareData.ownerIdCard || undefined,
+      })
       
       toast.success(response.message || 'Registrasi berhasil!')
       
@@ -134,12 +194,14 @@ export default function RegisterPage() {
             <Building2 className="h-8 w-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold mb-2">
-            {role === 'umkm' && step === 2 ? 'Data Usaha' : 'Daftar Sekarang'}
+            {role === 'umkm' && step === 2 ? 'Data Usaha' : 
+             role === 'umkm' && step === 3 ? 'Konfigurasi Saham & Dokumen' : 
+             'Daftar Sekarang'}
           </h1>
           <p className="text-blue-100 text-sm">
-            {role === 'umkm' && step === 2 
-              ? 'Lengkapi data usaha untuk listing' 
-              : 'Mulai investasi di UMKM Indonesia'}
+            {role === 'umkm' && step === 2 ? 'Lengkapi informasi usaha Anda' : 
+             role === 'umkm' && step === 3 ? 'Atur saham dan upload dokumen' :
+             'Mulai investasi di UMKM Indonesia'}
           </p>
         </div>
 
@@ -240,7 +302,7 @@ export default function RegisterPage() {
                 )}
               </Button>
             </form>
-          ) : (
+          ) : step === 2 ? (
             <form onSubmit={handleRegister} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="businessName" className="text-base">Nama Usaha</Label>
@@ -310,6 +372,32 @@ export default function RegisterPage() {
                   />
                 </div>
                 <div className="space-y-2">
+                  <Label htmlFor="netProfit" className="text-base">Laba Bersih</Label>
+                  <Input 
+                    id="netProfit" 
+                    type="number" 
+                    placeholder="100000000" 
+                    required 
+                    className="h-12 text-base"
+                    value={businessData.netProfit}
+                    onChange={handleStep2Change}
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label htmlFor="totalAssets" className="text-base">Total Aset</Label>
+                  <Input 
+                    id="totalAssets" 
+                    type="number" 
+                    placeholder="300000000" 
+                    required 
+                    className="h-12 text-base"
+                    value={businessData.totalAssets}
+                    onChange={handleStep2Change}
+                  />
+                </div>
+                <div className="space-y-2">
                   <Label htmlFor="employees" className="text-base">Karyawan</Label>
                   <Input 
                     id="employees" 
@@ -337,6 +425,145 @@ export default function RegisterPage() {
                   className="flex-1 h-12 text-base font-semibold"
                   disabled={loading}
                 >
+                  Lanjutkan
+                </Button>
+              </div>
+            </form>
+          ) : step === 3 ? (
+            <form onSubmit={handleRegister} className="space-y-4">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                <p className="text-sm text-blue-800 font-medium mb-2">Konfigurasi Saham</p>
+                <p className="text-xs text-blue-700">
+                  Tentukan berapa banyak saham yang akan dijual dan harga per lembar saham
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="totalShares" className="text-base">Total Lembar Saham</Label>
+                <Input 
+                  id="totalShares" 
+                  type="number" 
+                  placeholder="10000" 
+                  required 
+                  className="h-12 text-base"
+                  value={shareData.totalShares}
+                  onChange={handleStep3Change}
+                />
+                <p className="text-xs text-gray-500">Total saham yang akan diterbitkan</p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="sharesPercentage" className="text-base">Persentase Dijual (%)</Label>
+                <Input 
+                  id="sharesPercentage" 
+                  type="number" 
+                  placeholder="20" 
+                  required 
+                  min="1"
+                  max="49"
+                  className="h-12 text-base"
+                  value={shareData.sharesPercentage}
+                  onChange={handleStep3Change}
+                />
+                <p className="text-xs text-gray-500">
+                  {shareData.totalShares && shareData.sharesPercentage 
+                    ? `= ${Math.floor((Number(shareData.totalShares) * Number(shareData.sharesPercentage)) / 100)} lembar saham`
+                    : 'Maksimal 49% dari total saham'}
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="pricePerShare" className="text-base">Harga per Lembar</Label>
+                <Input 
+                  id="pricePerShare" 
+                  type="number" 
+                  placeholder="50000" 
+                  required 
+                  className="h-12 text-base"
+                  value={shareData.pricePerShare}
+                  onChange={handleStep3Change}
+                />
+                <p className="text-xs text-gray-500">Harga per lembar saham dalam Rupiah</p>
+              </div>
+
+              {shareData.totalShares && shareData.sharesPercentage && shareData.pricePerShare && (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <p className="text-sm font-semibold text-green-800 mb-2">Estimasi Dana yang Diperoleh</p>
+                  <p className="text-2xl font-bold text-green-700">
+                    Rp {(Math.floor((Number(shareData.totalShares) * Number(shareData.sharesPercentage)) / 100) * Number(shareData.pricePerShare)).toLocaleString('id-ID')}
+                  </p>
+                </div>
+              )}
+
+              <div className="border-t pt-4 mt-4">
+                <p className="text-sm font-semibold mb-3">Upload Dokumen</p>
+                
+                <div className="space-y-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="businessLicense" className="text-sm">Izin Usaha (SIUP/NIB)</Label>
+                    <Input 
+                      id="businessLicense" 
+                      type="file" 
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      required 
+                      className="h-12 text-sm"
+                      onChange={(e) => handleFileChange(e, 'businessLicense')}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="financialReport" className="text-sm">Laporan Keuangan</Label>
+                    <Input 
+                      id="financialReport" 
+                      type="file" 
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      required 
+                      className="h-12 text-sm"
+                      onChange={(e) => handleFileChange(e, 'financialReport')}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="taxReport" className="text-sm">NPWP & SPT</Label>
+                    <Input 
+                      id="taxReport" 
+                      type="file" 
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      required 
+                      className="h-12 text-sm"
+                      onChange={(e) => handleFileChange(e, 'taxReport')}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="ownerIdCard" className="text-sm">KTP Pemilik</Label>
+                    <Input 
+                      id="ownerIdCard" 
+                      type="file" 
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      required 
+                      className="h-12 text-sm"
+                      onChange={(e) => handleFileChange(e, 'ownerIdCard')}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-3 mt-6">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  className="flex-1 h-12 text-base"
+                  onClick={() => setStep(2)}
+                  disabled={loading}
+                >
+                  Kembali
+                </Button>
+                <Button 
+                  type="submit" 
+                  className="flex-1 h-12 text-base font-semibold"
+                  disabled={loading}
+                >
                   {loading ? (
                     <>
                       <Loader2 className="mr-2 h-5 w-5 animate-spin" />
@@ -348,7 +575,7 @@ export default function RegisterPage() {
                 </Button>
               </div>
             </form>
-          )}
+          ) : null}
 
           {step === 1 && (
             <>

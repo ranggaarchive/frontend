@@ -1,16 +1,80 @@
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Layout from '@/components/Layout'
 import MobileHeader from '@/components/MobileHeader'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { User, Mail, Phone, Shield, Bell, HelpCircle, LogOut, ChevronRight, Award } from 'lucide-react'
+import { User, Mail, Phone, Shield, Bell, HelpCircle, LogOut, ChevronRight, Award, Loader2 } from 'lucide-react'
+import auditorService, { type DashboardData } from '@/services/auditor.service'
+import authService from '@/services/auth.service'
+import { toast } from 'sonner'
 
 export default function AuditorProfile() {
   const navigate = useNavigate()
+  const [loading, setLoading] = useState(true)
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null)
+  const user = authService.getStoredUser()
 
-  const handleLogout = () => {
-    navigate('/login')
+  useEffect(() => {
+    loadData()
+  }, [])
+
+  const loadData = async () => {
+    try {
+      setLoading(true)
+      const data = await auditorService.getDashboard()
+      setDashboardData(data)
+    } catch (error: any) {
+      console.error('Failed to load profile data:', error)
+      toast.error('Gagal memuat data profil')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleLogout = async () => {
+    try {
+      await authService.logout()
+      toast.success('Berhasil logout')
+      navigate('/login')
+    } catch (error) {
+      console.error('Logout error:', error)
+      toast.error('Gagal logout')
+    }
+  }
+
+  if (loading) {
+    return (
+      <Layout role="auditor">
+        <MobileHeader title="Profile" />
+        <div className="flex items-center justify-center h-[calc(100vh-200px)]">
+          <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        </div>
+      </Layout>
+    )
+  }
+
+  const stats = dashboardData?.stats || {
+    pending: 0,
+    approvedThisMonth: 0,
+    rejectedThisMonth: 0,
+    totalReviewed: 0,
+  }
+
+  const totalThisMonth = stats.approvedThisMonth + stats.rejectedThisMonth
+  const approvalRate = totalThisMonth > 0 
+    ? ((stats.approvedThisMonth / totalThisMonth) * 100).toFixed(1)
+    : '0.0'
+
+  // Get initials from user name
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2)
   }
 
   return (
@@ -23,28 +87,28 @@ export default function AuditorProfile() {
           <CardContent className="pt-5 pb-5">
             <div className="flex items-start gap-4 mb-4">
               <div className="h-16 w-16 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
-                AS
+                {user ? getInitials(user.fullName) : 'AU'}
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-lg mb-1">Ahmad Santoso</h3>
+                <h3 className="font-semibold text-lg mb-1">{user?.fullName || 'Auditor'}</h3>
                 <Badge variant="secondary" className="bg-purple-100 text-purple-700 border-0 mb-2">
                   <Award className="h-3 w-3 mr-1" />
                   Auditor
                 </Badge>
-                <p className="text-sm text-gray-600">Member sejak Jan 2025</p>
+                <p className="text-sm text-gray-600">Member sejak 2025</p>
               </div>
             </div>
             <div className="grid grid-cols-3 gap-3 pt-4 border-t">
               <div className="text-center">
-                <p className="text-xl font-bold text-blue-600">156</p>
+                <p className="text-xl font-bold text-blue-600">{stats.totalReviewed}</p>
                 <p className="text-xs text-gray-600">Total Review</p>
               </div>
               <div className="text-center">
-                <p className="text-xl font-bold text-green-600">48</p>
+                <p className="text-xl font-bold text-green-600">{stats.approvedThisMonth}</p>
                 <p className="text-xs text-gray-600">Approved</p>
               </div>
               <div className="text-center">
-                <p className="text-xl font-bold text-yellow-600">12</p>
+                <p className="text-xl font-bold text-yellow-600">{stats.pending}</p>
                 <p className="text-xs text-gray-600">Pending</p>
               </div>
             </div>
@@ -60,21 +124,21 @@ export default function AuditorProfile() {
                 <Mail className="h-5 w-5 text-gray-400" />
                 <div className="flex-1">
                   <p className="text-xs text-gray-500">Email</p>
-                  <p className="font-medium">ahmad.santoso@auditor.com</p>
+                  <p className="font-medium">{user?.email || '-'}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3 py-3">
                 <Phone className="h-5 w-5 text-gray-400" />
                 <div className="flex-1">
                   <p className="text-xs text-gray-500">Telepon</p>
-                  <p className="font-medium">+62 821 9876 5432</p>
+                  <p className="font-medium">{user?.phone || '-'}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3 py-3">
                 <User className="h-5 w-5 text-gray-400" />
                 <div className="flex-1">
                   <p className="text-xs text-gray-500">ID Auditor</p>
-                  <p className="font-medium">AUD-2025-001</p>
+                  <p className="font-medium">AUD-{user?.id || '000'}</p>
                 </div>
               </div>
             </CardContent>
@@ -89,15 +153,15 @@ export default function AuditorProfile() {
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">Review Selesai</span>
-                  <span className="font-semibold">48 UMKM</span>
+                  <span className="font-semibold">{totalThisMonth} UMKM</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">Approval Rate</span>
-                  <span className="font-semibold text-green-600">85.7%</span>
+                  <span className="font-semibold text-green-600">{approvalRate}%</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Avg Review Time</span>
-                  <span className="font-semibold">2.5 hari</span>
+                  <span className="text-sm text-gray-600">Rejected</span>
+                  <span className="font-semibold text-red-600">{stats.rejectedThisMonth} UMKM</span>
                 </div>
               </div>
             </CardContent>
