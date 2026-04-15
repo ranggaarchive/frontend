@@ -229,6 +229,27 @@ export default function UmkmDashboard() {
           </Card>
         </div>
 
+        {/* Quick Actions */}
+        <Card>
+          <CardContent className="pt-5 pb-5">
+            <h3 className="font-semibold mb-4">Aksi Cepat</h3>
+            <div className="grid grid-cols-2 gap-3">
+              <Link to="/umkm/listing-detail">
+                <Button variant="outline" className="w-full h-auto py-3 flex-col gap-2">
+                  <Eye className="h-5 w-5" />
+                  <span className="text-xs">Detail Listing</span>
+                </Button>
+              </Link>
+              <Link to="/umkm/dividend">
+                <Button variant="outline" className="w-full h-auto py-3 flex-col gap-2">
+                  <DollarSign className="h-5 w-5 text-green-600" />
+                  <span className="text-xs">Bayar Dividen</span>
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Price Chart */}
         {priceHistory && priceHistory.length > 0 && (
           <Card>

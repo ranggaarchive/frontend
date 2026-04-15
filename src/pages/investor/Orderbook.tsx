@@ -539,8 +539,8 @@ export default function OrderbookPage() {
                                 <p className="text-xs text-gray-500">PDF Document</p>
                               </div>
                               <a
-                                href={`${import.meta.env.VITE_API_URL}/${doc.file}`}
-                                download
+                                href={doc.file}
+                                download={`${doc.name}.pdf`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                               >

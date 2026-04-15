@@ -199,6 +199,48 @@ class UmkmService {
     const response = await api.get<{ data: { file: string; mime: string; period: string } }>(`/umkm/reports/${reportId}/download`)
     return response.data.data
   }
+
+  /**
+   * Pay dividend to investors
+   */
+  async payDividend(data: PayDividendRequest): Promise<PayDividendResponse> {
+    const response = await api.post<{ data: PayDividendResponse }>('/umkm/dividend', data)
+    return response.data.data
+  }
+
+  /**
+   * Get dividend history
+   */
+  async getDividendHistory(): Promise<DividendHistory[]> {
+    const response = await api.get<{ data: DividendHistory[] }>('/umkm/dividend/history')
+    return response.data.data
+  }
 }
 
 export default new UmkmService()
+
+export interface PayDividendRequest {
+  period: string
+  netProfit: number
+  dividendPercentage: number
+  notes?: string
+}
+
+export interface PayDividendResponse {
+  dividendId: number
+  totalDividend: number
+  dividendPerShare: number
+  investorsCount: number
+}
+
+export interface DividendHistory {
+  id: number
+  period: string
+  netProfit: number
+  dividendPercentage: number
+  totalDividend: number
+  dividendPerShare: number
+  status: string
+  distributedAt: string
+  notes: string | null
+}
