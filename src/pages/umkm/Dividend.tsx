@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
-import { DollarSign, TrendingUp, Users, Loader2, AlertCircle, CheckCircle } from 'lucide-react'
+import { DollarSign, Loader2, AlertCircle, CheckCircle } from 'lucide-react'
 import umkmService, { type DividendHistory } from '@/services/umkm.service'
 import { toast } from 'sonner'
 
