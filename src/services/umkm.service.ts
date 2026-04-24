@@ -46,7 +46,7 @@ export interface Investor {
   shares: number
   averagePrice: number
   totalInvestment: number
-  percentage: string
+  percentage: number
   joinedAt: string
 }
 
@@ -215,6 +215,29 @@ class UmkmService {
     const response = await api.get<{ data: DividendHistory[] }>('/umkm/dividend/history')
     return response.data.data
   }
+
+  /**
+   * Get balance and earnings
+   */
+  async getBalance(): Promise<BalanceData> {
+    const response = await api.get<{ data: BalanceData }>('/umkm/balance')
+    return response.data.data
+  }
+
+  /**
+   * Request withdrawal
+   */
+  async requestWithdrawal(data: WithdrawalRequest): Promise<WithdrawalItem> {
+    const response = await api.post<{ data: WithdrawalItem }>('/umkm/withdrawal', data)
+    return response.data.data
+  }
+
+  /**
+   * Cancel withdrawal
+   */
+  async cancelWithdrawal(withdrawalId: number): Promise<void> {
+    await api.delete(`/umkm/withdrawal/${withdrawalId}`)
+  }
 }
 
 export default new UmkmService()
@@ -243,4 +266,33 @@ export interface DividendHistory {
   status: string
   distributedAt: string
   notes: string | null
+}
+
+export interface WithdrawalItem {
+  id: number
+  amount: number
+  bankName: string
+  accountNumber: string
+  accountName: string
+  status: 'pending' | 'processing' | 'completed' | 'rejected'
+  notes: string | null
+  createdAt: string
+  processedAt: string | null
+}
+
+export interface BalanceData {
+  balance: number
+  totalEarnings: number
+  totalWithdrawn: number
+  pendingWithdrawal: number
+  availableBalance: number
+  withdrawals: WithdrawalItem[]
+}
+
+export interface WithdrawalRequest {
+  amount: number
+  bankName: string
+  accountNumber: string
+  accountName: string
+  notes?: string
 }

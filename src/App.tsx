@@ -19,6 +19,8 @@ import UmkmReports from './pages/umkm/Reports.tsx'
 import UmkmProfile from './pages/umkm/Profile.tsx'
 import UmkmInvestors from './pages/umkm/Investors.tsx'
 import UmkmDividend from './pages/umkm/Dividend.tsx'
+import UmkmBalance from './pages/umkm/Balance.tsx'
+import UmkmWithdrawal from './pages/umkm/Withdrawal.tsx'
 import AuditorDashboard from './pages/auditor/Dashboard.tsx'
 import AuditorReview from './pages/auditor/Review.tsx'
 import AuditorApproved from './pages/auditor/Approved.tsx'
@@ -145,6 +147,22 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={['umkm']}>
               <UmkmDividend />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/umkm/balance"
+          element={
+            <ProtectedRoute allowedRoles={['umkm']}>
+              <UmkmBalance />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/umkm/withdrawal"
+          element={
+            <ProtectedRoute allowedRoles={['umkm']}>
+              <UmkmWithdrawal />
             </ProtectedRoute>
           }
         />

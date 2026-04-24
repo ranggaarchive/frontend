@@ -172,11 +172,19 @@ export default function UmkmProfile() {
           </CardContent>
         </Card>
 
-        {/* Business Details */}
+        {/* Account Info */}
         <div>
-          <h3 className="font-semibold mb-3 px-1">Informasi Usaha</h3>
+          <h3 className="font-semibold mb-3 px-1">Informasi Akun</h3>
           <Card>
             <CardContent className="pt-3 pb-3 divide-y">
+              <Link to="/umkm/balance" className="flex items-center gap-3 py-3">
+                <Wallet className="h-5 w-5 text-gray-400" />
+                <div className="flex-1">
+                  <p className="text-xs text-gray-500">Saldo</p>
+                  <p className="font-medium">Rp {user?.balance ? Number(user.balance).toLocaleString('id-ID') : '0'}</p>
+                </div>
+                <ChevronRight className="h-5 w-5 text-gray-400" />
+              </Link>
               <div className="flex items-center gap-3 py-3">
                 <Mail className="h-5 w-5 text-gray-400" />
                 <div className="flex-1">
